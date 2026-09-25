@@ -1,0 +1,53 @@
+{
+  "annotations": {
+    "changelogDate": "20231204223623"
+  },
+  "applications": ["oncall"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "peso",
+      "fieldType": "PesoDependencia",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "DEGRADA,AFECTA,ROMPE,NO_AFECTA"
+    },
+    {
+      "fieldName": "descripcion",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "400"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "DependenciaDeServicio",
+  "pagination": "infinite-scroll",
+  "relationships": [
+    {
+      "otherEntityField": "nombre",
+      "otherEntityName": "servicio",
+      "otherEntityRelationshipName": "comoDependiente",
+      "relationshipName": "dependiente",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    },
+    {
+      "otherEntityField": "nombre",
+      "otherEntityName": "servicio",
+      "otherEntityRelationshipName": "comoOrigen",
+      "relationshipName": "origen",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    },
+    {
+      "otherEntityName": "impactoPropagado",
+      "otherEntityRelationshipName": "dependencia",
+      "relationshipName": "impacto",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

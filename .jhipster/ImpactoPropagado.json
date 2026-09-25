@@ -1,0 +1,58 @@
+{
+  "annotations": {
+    "changelogDate": "20231204223823"
+  },
+  "applications": ["oncall"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "severidad",
+      "fieldType": "Severidad",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "SEV1,SEV2,SEV3,SEV4"
+    },
+    {
+      "fieldName": "desde",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "hasta",
+      "fieldType": "Instant"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "ImpactoPropagado",
+  "pagination": "infinite-scroll",
+  "relationships": [
+    {
+      "otherEntityField": "titulo",
+      "otherEntityName": "incidente",
+      "otherEntityRelationshipName": "impacto",
+      "relationshipName": "incidente",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    },
+    {
+      "otherEntityField": "nombre",
+      "otherEntityName": "servicio",
+      "otherEntityRelationshipName": "impacto",
+      "relationshipName": "servicio",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    },
+    {
+      "otherEntityField": "descripcion",
+      "otherEntityName": "dependenciaDeServicio",
+      "otherEntityRelationshipName": "impacto",
+      "relationshipName": "dependencia",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

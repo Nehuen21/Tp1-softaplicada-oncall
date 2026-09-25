@@ -1,250 +1,289 @@
-# OnCall · Sistema de guardias e incidentes
+# oncall
 
-Caso de estudio de **Ingeniería de Software Aplicada** — Universidad de Mendoza.
+This application was generated using JHipster 9.2.0, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v9.2.0](https://www.jhipster.tech/documentation-archive/v9.2.0).
 
----
+## Project Structure
 
-## El problema
+Node is required for generation and recommended for development. `package.json` is always generated for a better development experience with prettier, commit hooks, scripts and so on.
 
-Un equipo opera varios servicios en producción. Las herramientas de monitoreo tiran alertas todo el día: la mayoría es ruido, algunas son una interrupción real. Alguien tiene que estar de guardia, alguien tiene que ser despertado a las 3 de la mañana, y cuando el fuego se apaga hay que medir cuánto tardamos y escribir qué aprendimos.
+In the project root, JHipster generates configuration files for tools like git, prettier, eslint, husky, and others that are well known and you can find references in the web.
 
-Eso es lo que vamos a construir. No es casual: **es el mismo problema del que trata la materia**. Toda la complejidad que un framework nos permite delegar, después hay que operarla.
+`/src/*` structure follows default Java structure.
 
----
+- `.yo-rc.json` - Yeoman configuration file
+  JHipster configuration is stored in this file at `generator-jhipster` key. You may find `generator-jhipster-*` for specific blueprints configuration.
+- `.yo-resolve` (optional) - Yeoman conflict resolver
+  Allows to use a specific action when conflicts are found skipping prompts for files that matches a pattern. Each line should match `[pattern] [action]` with pattern been a [Minimatch](https://github.com/isaacs/minimatch#minimatch) pattern and action been one of skip (default if omitted) or force. Lines starting with `#` are considered comments and are ignored.
+- `.jhipster/*.json` - JHipster entity configuration files
 
-## Requisitos previos
+- `npmw` - wrapper to use locally installed npm.
+  JHipster installs Node and npm locally using the build tool by default. This wrapper makes sure npm is installed locally and uses it avoiding some differences different versions can cause. By using `./npmw` instead of the traditional `npm` you can configure a Node-less environment to develop or test your application.
+- `/src/main/docker` - Docker configurations for the application and services that the application depends on
 
-Traer instalado y funcionando **antes** de la clase:
+## Development
 
-| Herramienta                                                         | Verificación       |
-| ------------------------------------------------------------------- | ------------------ |
-| [Docker Desktop](https://www.docker.com/products/docker-desktop)    | `docker --version` |
-| [Git](https://git-scm.com/downloads)                                | `git --version`    |
-| [Visual Studio Code](https://code.visualstudio.com/download)        | —                  |
-| Extensión **Dev Containers** (`ms-vscode-remote.remote-containers`) | —                  |
+The build system will install automatically the recommended version of Node and npm.
 
-> ⚠️ La primera vez que abras el Dev Container se descargan varios GB. **Hacelo en casa, no en la facultad.**
-
----
-
-## Clase 1 · Levantar el entorno
+We provide a wrapper to launch npm.
+You will only need to run this command when dependencies change in [package.json](package.json).
 
 ```bash
-git clone https://github.com/jeremiascastilloum/isa-oncall-monolithic.git
-cd isa-oncall-monolithic
-code .
+./npmw install
 ```
 
-Cuando VS Code muestre el aviso _"Folder contains a Dev Container configuration file"_ → **Reopen in Container**.
+We use npm scripts and [Angular CLI](https://angular.dev/tools/cli) with esbuild as our build system.
 
-Si no aparece: `Ctrl+Shift+P` → **Dev Containers: Reopen in Container**.
-
-Al terminar, verificá adentro del contenedor:
+Run the following commands in two separate terminals to create a blissful development experience where your browser
+auto-refreshes when files change on your hard drive.
 
 ```bash
-java -version      # 21
-node --version     # 22
-jhipster --version # 9.2.0
-docker ps          # sin errores
+./npmw run backend:start
+./npmw run start
 ```
 
-Con eso alcanza. Todavía no generamos nada.
+Npm is also used to manage CSS and JavaScript dependencies used in this application. You can upgrade dependencies by
+specifying a newer version in [package.json](package.json). You can also run `./npmw update` and `./npmw install` to manage dependencies.
+Add the `help` flag on any command to see how you can use it. For example, `./npmw help update`.
 
----
+The `./npmw run` command will list all the scripts available to run for this project.
 
-## Clase 2 · Del modelo a la aplicación
+### PWA Support
 
-### 1. Mirar el modelo
+JHipster ships with PWA (Progressive Web App) support, and it's turned off by default. One of the main components of a PWA is a service worker.
 
-Abrí [JDL Studio](https://start.jhipster.tech/jdl-studio/) y pegá el contenido de [`oncall.jh`](./oncall.jh). Vas a ver el diagrama entidad-relación completo: 13 entidades, 10 enumeraciones, y las relaciones entre ellas.
+The service worker initialization code is disabled by default. To enable it, uncomment the following code in `src/main/webapp/app/app.config.ts`:
 
-### 2. Generar
+```typescript
+ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
+```
 
-Desde la terminal del Dev Container:
+### Managing dependencies
+
+For example, to add [Leaflet](https://leafletjs.com/) library as a runtime dependency of your application, you would run the following command:
 
 ```bash
-jhipster jdl oncall.jh
+./npmw install --save --save-exact leaflet
 ```
 
-Tomate el tiempo de mirar la consola. Cuando termine, contá los archivos:
+To benefit from TypeScript type definitions from [DefinitelyTyped](https://definitelytyped.org/) repository in development, you would run the following command:
 
 ```bash
-git status --porcelain | wc -l
+./npmw install --save-dev --save-exact @types/leaflet
 ```
 
-### 3. Levantar la base de datos
+Then you would import the JS and CSS files specified in library's installation instructions so that [esbuild][] knows about them:
+Edit [src/main/webapp/app/app.config.ts](src/main/webapp/app/app.config.ts) file:
+
+```typescript
+import 'leaflet/dist/leaflet.js';
+```
+
+Edit [src/main/webapp/content/scss/vendor.scss](src/main/webapp/content/scss/vendor.scss) file:
+
+```typescript
+@import 'leaflet/dist/leaflet.css';
+```
+
+Note: There are still a few other things remaining to do for Leaflet that we won't detail here.
+
+For further instructions on how to develop with JHipster, have a look at [Using JHipster in development](https://www.jhipster.tech/development/).
+
+### Using Angular CLI
+
+You can also use [Angular CLI](https://angular.dev/tools/cli) to generate some custom client code.
+
+For example, the following command:
 
 ```bash
-docker compose -f src/main/docker/postgresql.yml up -d
+ng generate component my-component
 ```
 
-### 4. Levantar la aplicación
-
-Dos terminales:
+will generate few files:
 
 ```bash
-./mvnw          # backend, puerto 8080
+create src/main/webapp/app/my-component/my-component.html
+create src/main/webapp/app/my-component/my-component.ts
+update src/main/webapp/app/app.config.ts
 ```
+
+## Building for production
+
+### Packaging as jar
+
+To build the final jar and optimize the oncall application for production, run:
 
 ```bash
-npm start       # frontend, puerto 9000
+./mvnw -Pprod clean verify
 ```
 
-Entrás en `http://localhost:9000` con `admin` / `admin`.
-
----
-
-## Lo que el generador NO te dio
-
-Recorré la aplicación. Podés dar de alta servicios, equipos, rotaciones, turnos, incidentes y alertas. Todo tiene ABM, validaciones, paginación, filtros, seguridad y tests.
-
-Y sin embargo la aplicación **no sirve para nada todavía**, porque falta exactamente lo que ningún generador puede adivinar:
-
-1. **Deduplicar alertas.** Llega una alerta con un `fingerprint` que ya existe en un incidente abierto: ¿se pega a ese incidente o abre uno nuevo?
-2. **Resolver quién está de guardia ahora.** Dado un instante y una rotación, ¿qué persona es la responsable? ¿Y si hay un reemplazo cargado?
-3. **Ejecutar el escalamiento.** Nadie reconoció el incidente en 5 minutos: hay que pasar al siguiente `PasoEscalamiento` y disparar la notificación.
-4. **Calcular MTTA, MTTR y cumplimiento de SLO.** Con las marcas de tiempo del incidente y el `ObjetivoDeServicio` que aplica a su severidad.
-
-Esas cuatro reglas son el material de las clases siguientes.
-
----
-
-## Regenerar después de tocar el modelo
-
-Si editás `oncall.jh` —agregás un campo, cambiás un tipo, sumás una entidad— **no alcanza con volver a correr `jhipster jdl`**. Hay dos estados que sobreviven a la regeneración y hay que limpiar a mano.
-
-### 1. Regenerar el código
+This will concatenate and minify the client CSS and JavaScript files. It will also modify `index.html` so it references these new files.
+To ensure everything worked, run:
 
 ```bash
-jhipster jdl oncall.jh --force
+java -jar target/*.jar
 ```
 
-Sin `--force`, JHipster pregunta archivo por archivo si lo pisa.
+Then navigate to [http://localhost:8080](http://localhost:8080) in your browser.
 
-Si cambiaste algo del bloque `application { config { ... } }` —el tema, el idioma, el tipo de base— además hay que borrar la memoria del generador, que vive en `.yo-rc.json`:
+Refer to [Using JHipster in production][] for more details.
+
+### Packaging as war
+
+To package your application as a war in order to deploy it to an application server, run:
 
 ```bash
-rm -rf .yo-rc.json .jhipster/
-jhipster jdl oncall.jh --force
+./mvnw -Pprod,war clean verify
 ```
 
-### 2. Recrear la base
+### JHipster Control Center
 
-Este paso es obligatorio y es el que más se olvida.
-
-Liquibase guarda en la tabla `databasechangelog` un hash de cada changeset ejecutado. Al arrancar compara ese hash contra el archivo actual; si cambiaron, **frena antes de tocar nada** y la aplicación levanta con la base inutilizable:
-
-```
-Validation Failed: N changesets check sum
-  ..._added_entity_Alerta.xml::...::jhipster was: 9:7d48... but is now: 9:3600...
-```
-
-No es un error a esquivar: es Liquibase evitando dejarte un esquema inconsistente. La solución es empezar de cero.
+JHipster Control Center can help you manage and control your application(s). You can start a local control center server (accessible on http://localhost:7419) with:
 
 ```bash
-docker compose -f src/main/docker/postgresql.yml down -v
-docker compose -f src/main/docker/postgresql.yml up -d
-./mvnw
+docker compose -f src/main/docker/jhipster-control-center.yml up
 ```
 
-El `-v` es lo que importa: sin eso el volumen sobrevive y el error se repite.
+## Testing
 
-**Si el error persiste**, el volumen no se borró — pasa cuando `down -v` se corre desde otro directorio, porque Compose deriva el nombre del proyecto de la carpeta. Vaciar el esquema directamente siempre funciona:
+### Spring Boot tests
+
+To launch your application's tests, run:
 
 ```bash
-docker exec -it oncall-postgresql psql -U oncall -d oncall \
-  -c "drop schema public cascade; create schema public;"
+./mvnw verify
 ```
 
-Eso se lleva las tablas **y** la `databasechangelog`, que es lo que realmente bloquea.
+### Client tests
 
-### 3. Verificar que arrancó limpio
-
-En el log de arranque, buscá la línea de Liquibase:
-
-```
-Liquibase has updated your database in 4821 ms
-```
-
-Varios segundos significa que creó el esquema y cargó los datos falsos. **Un segundo o menos significa que no hizo nada**: encontró todo aplicado y siguió de largo. Ese es el síntoma de una base vieja.
-
-Confirmación desde afuera:
+Unit tests are run by Vitest. They're located near components and can be run with:
 
 ```bash
-docker exec -it oncall-postgresql psql -U oncall -d oncall -c "select count(*) from incidente;"
+./npmw test
 ```
 
-### Antes de commitear
+#### E2E tests
 
-Después de regenerar, **siempre**:
+UI end-to-end tests are powered by [Cypress][]. They're located in [src/test/javascript/cypress/](src/test/javascript/cypress/)
+and can be run by starting Spring Boot in one terminal (`./npmw run app:start`) and running the tests (`./npmw run e2e`) in a second one.
+
+Before running Cypress tests, it's possible to specify user credentials by overriding the `CYPRESS_E2E_USERNAME` and `CYPRESS_E2E_PASSWORD` environment variables.
 
 ```bash
-git status
+export CYPRESS_E2E_USERNAME="<your-username>"
+export CYPRESS_E2E_PASSWORD="<your-password>"
 ```
 
-Si aparecen cientos de archivos, la aplicación generada quedó sin ignorar. El repositorio versiona el modelo y el entorno, no el código generado.
+See Cypress documentation for setting OS [environment variables](https://docs.cypress.io/app/references/environment-variables#Setting) to learn more.
 
----
+#### Lighthouse audits
 
-## Estructura del repositorio
+You can execute automated [Lighthouse audits](https://developer.chrome.com/docs/lighthouse/overview) with [cypress-audit](https://github.com/mfrachet/cypress-audit) by running `./npmw run e2e:cypress:audits`.
 
+You should only run the audits when your application is packaged with the production profile.
+
+The Lighthouse report is created in `target/cypress/lhreport.html`.
+
+## Others
+
+### Code quality using Sonar
+
+Sonar is used to analyse code quality. You can start a local Sonar server (accessible on http://localhost:9001) with:
+
+```bash
+docker compose -f src/main/docker/sonar.yml up -d
 ```
-isa-oncall-monolithic/
-├── .devcontainer/
-│   └── devcontainer.json    # Java 21 + Node 22 + Docker + JHipster 9.2
-├── docs/
-│   └── modelo.md            # el modelo explicado en prosa
-├── oncall.jh                # el modelo JDL
-└── README.md
+
+Note: we have turned off forced authentication redirect for UI in [src/main/docker/sonar.yml](src/main/docker/sonar.yml) for out of the box experience while trying out SonarQube, for real use cases turn it back on.
+
+You can run a Sonar analysis with using the [sonar-scanner](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) or by using the maven plugin.
+
+Then, run a Sonar analysis:
+
+```bash
+./mvnw -Pprod clean verify sonar:sonar -Dsonar.login=admin -Dsonar.password=admin
 ```
 
----
+If you need to re-run the Sonar phase, please be sure to specify at least the `initialize` phase since Sonar properties are loaded from the sonar-project.properties file.
 
-## Versiones
+```bash
+./mvnw initialize sonar:sonar -Dsonar.login=admin -Dsonar.password=admin
+```
 
-|             |                            |
-| ----------- | -------------------------- |
-| JHipster    | 9.2.0                      |
-| Spring Boot | 4.0.x                      |
-| Java        | 21 (LTS)                   |
-| Angular     | 20.x                       |
-| Node        | 22 (LTS)                   |
-| PostgreSQL  | 17                         |
-| Tests       | JUnit 5 · Vitest · Cypress |
+Additionally, Instead of passing `sonar.password` and `sonar.login` as CLI arguments, these parameters can be configured from [sonar-project.properties](sonar-project.properties) as shown below:
 
----
+```bash
+sonar.login=admin
+sonar.password=admin
+```
 
-## Si algo falla
+For more information, refer to the [Code quality page][].
 
-**El Dev Container no arranca / se queda colgado.** Revisá que Docker Desktop esté corriendo y que tenga al menos 8 GB de memoria asignada (Settings → Resources).
+### Docker Compose support
 
-**`jhipster jdl` falla con un error de parseo.** Confirmá la versión con `jhipster --version`. El JDL está escrito para 9.2.0.
+JHipster generates a number of Docker Compose configuration files in the [src/main/docker/](src/main/docker/) folder to launch required third party services.
 
-**No querés depender de PostgreSQL.** Cambiá `devDatabaseType postgresql` por `devDatabaseType h2Disk` en el `oncall.jh` antes de generar. La aplicación levanta sin Docker, pero perdés el ejercicio de contenedores.
+For example, to start required services in Docker containers, run:
 
-**El log está lleno de stack traces al arrancar.** Los `ProcessBuilder.start() debug` no son errores: son trazas de nivel DEBUG que emite el JDK al lanzar procesos externos, y las dispara el módulo de Docker Compose de Spring Boot buscando el binario de `docker`. Para silenciarlas, en `src/main/resources/config/application-dev.yml`:
+```bash
+docker compose -f src/main/docker/services.yml up -d
+```
+
+To stop and remove the containers, run:
+
+```bash
+docker compose -f src/main/docker/services.yml down
+```
+
+[Spring Docker Compose Integration](https://docs.spring.io/spring-boot/reference/features/dev-services.html) is enabled by default. It's possible to disable it in `application.yml`:
 
 ```yaml
-logging:
-  level:
-    ROOT: INFO
-
 spring:
+  ...
   docker:
     compose:
       enabled: false
 ```
 
----
+You can also fully dockerize your application and all the services that it depends on.
+To achieve this, first build a Docker image of your app by running:
 
-### Dos problemas conocidos del generador
+```bash
+npm run java:docker
+```
 
-Los dos aparecieron generando este proyecto y **ya están corregidos en el `oncall.jh` del repositorio**. Se documentan porque son instructivos: el generador escribió más de quinientos archivos y dos de ellos vinieron mal.
+Or build an arm64 Docker image when using an arm64 processor OS, i.e., Apple Silicon chips (M*), running:
 
-**`Bad value for type long` al listar una entidad.** El campo era un `TextBlob`, que JHipster mapea a `@Lob String`. Contra PostgreSQL, Hibernate intenta leer esa columna como un _large object_ —identificado por un OID, o sea un número— pero la columna contiene texto, y la conversión falla. Se manifiesta al hacer `GET` sobre la entidad, no al arrancar, así que parece que los datos falsos no se cargaron cuando en realidad sí están.
+```bash
+npm run java:docker:arm64
+```
 
-> Solución: no usar `TextBlob` con PostgreSQL. Un `String maxlength(2000)` genera un `varchar` y se lee sin problema.
+Then run:
 
-**`Could not resolve ".../bootswatch/dist/flatly||file:https://fonts.googleapis.com/..."`.** El build del frontend falla por un `@import` mal armado en `content/scss/vendor.scss`: una plantilla del generador concatenó la ruta del tema Bootswatch con la URL de la fuente en un solo `url()`. Aparece solo cuando se pide un `clientTheme`.
+```bash
+docker compose -f src/main/docker/app.yml up -d
+```
 
-> Solución: quitar `clientTheme` del bloque `config`. Es puramente estético. Al regenerar hay que borrar `vendor.scss` y `.yo-rc.json`, porque si no el tema anterior queda recordado.
+For more information refer to [Docker and Docker-Compose](https://www.jhipster.tech/documentation-archive/v9.2.0/docker-compose/), this page also contains information on the Docker Compose sub-generator (`jhipster docker-compose`), which is able to generate Docker configurations for one or several JHipster applications.
+
+## Continuous Integration (optional)
+
+To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate configuration files for a number of Continuous Integration systems. Consult the [Setting up Continuous Integration](https://www.jhipster.tech/documentation-archive/v9.2.0/setting-up-ci/) page for more information.
+
+## References
+
+- [JHipster Homepage and latest documentation](https://www.jhipster.tech/)
+- [JHipster 9.2.0 archive](https://www.jhipster.tech/documentation-archive/v9.2.0)
+- [Using JHipster in development](https://www.jhipster.tech/documentation-archive/v9.2.0/development/)
+- [Using Docker and Docker-Compose](https://www.jhipster.tech/documentation-archive/v9.2.0/docker-compose)
+- [Using JHipster in production](https://www.jhipster.tech/documentation-archive/v9.2.0/production/)
+- [Running tests page](https://www.jhipster.tech/documentation-archive/v9.2.0/running-tests/)
+- [Code quality page](https://www.jhipster.tech/documentation-archive/v9.2.0/code-quality/)
+- [Setting up Continuous Integration](https://www.jhipster.tech/documentation-archive/v9.2.0/setting-up-ci/)
+- [Node.js](https://nodejs.org/)
+- [NPM](https://www.npmjs.com/)
+- [BrowserSync](https://www.browsersync.io/)
+- [Jest](https://jestjs.io)
+- [Leaflet](https://leafletjs.com/)
+- [DefinitelyTyped](https://definitelytyped.org/)
+- [Angular CLI](https://angular.dev/tools/cli)
+- [Cypress](https://www.cypress.io/)

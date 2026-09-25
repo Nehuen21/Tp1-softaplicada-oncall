@@ -1,0 +1,35 @@
+{
+  "annotations": {
+    "changelogDate": "20231204223723"
+  },
+  "applications": ["oncall"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "volvioCriticoEn",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "motivo",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "400"
+    }
+  ],
+  "name": "ServicioCritico",
+  "pagination": "infinite-scroll",
+  "relationships": [
+    {
+      "otherEntityField": "nombre",
+      "otherEntityName": "servicio",
+      "otherEntityRelationshipName": "servicioCritico",
+      "relationshipName": "servicio",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

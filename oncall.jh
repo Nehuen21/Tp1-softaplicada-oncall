@@ -69,6 +69,25 @@ entity ObjetivoDeServicio {
   descripcion String maxlength(255)
 }
 
+
+entity DependenciaDeServicio {
+  peso PesoDependencia required
+  descripcion String maxlength(400)
+
+
+}
+
+entity ServicioCritico{
+  volvioCriticoEn Instant required
+  motivo String maxlength(400)
+
+}
+entity ImpactoPropagado{
+  severidad Severidad required
+  desde Instant required
+  hasta Instant
+}
+
 enum Criticidad {
   TIER1, TIER2, TIER3
 }
@@ -80,7 +99,9 @@ enum Entorno {
 enum TipoObjetivo {
   TIEMPO_DE_RECONOCIMIENTO, TIEMPO_DE_RESOLUCION, DISPONIBILIDAD
 }
-
+enum PesoDependencia {
+  DEGRADA, AFECTA, ROMPE, NO_AFECTA
+}
 // ---------------------------------------------------------------------
 // 2 · DETECCION  ·  del ruido de monitoreo al incidente
 // ---------------------------------------------------------------------
@@ -266,6 +287,25 @@ relationship ManyToOne {
 
   Notificacion{incidente(titulo) required} to Incidente{notificacion}
   AccionCorrectiva{postmortem(titulo) required} to Postmortem{accion}
+
+ 
+
+
+
+
+
+
+ 
+}
+relationship ManyToOne {
+  DependenciaDeServicio{dependiente(nombre) required} to Servicio{comoDependiente}
+  DependenciaDeServicio{origen(nombre) required} to Servicio{comoOrigen}
+
+  ServicioCritico{servicio(nombre) required} to Servicio{servicioCritico}
+
+  ImpactoPropagado{incidente(titulo) required} to Incidente{impacto}
+  ImpactoPropagado{servicio(nombre) required} to Servicio{impacto}
+  ImpactoPropagado{dependencia(descripcion) required} to DependenciaDeServicio{impacto}
 }
 
 /**
@@ -301,6 +341,6 @@ dto * with mapstruct
 service all with serviceClass
 
 paginate Incidente, Alerta, Postmortem with pagination
-paginate EventoDeIncidente, Notificacion, TurnoDeGuardia with infinite-scroll
+paginate EventoDeIncidente, Notificacion, TurnoDeGuardia, DependenciaDeServicio, ServicioCritico, ImpactoPropagado with infinite-scroll
 
-filter Incidente, Alerta, Servicio, Notificacion
+filter Incidente, Alerta, Servicio, Notificacion, DependenciaDeServicio, ImpactoPropagado
